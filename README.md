@@ -12,10 +12,16 @@ To try out and compile this emulator, make sure you have cargo installed:
 curl https://sh.rustup.rs -sSf | sh
 ```
 
-Then download some games, edit the `rom_path` variable in `src/main.rs` to be the name of your `.ch8` game file, and run using the following:
+Download this repository using:
 
 ```
-cargo run
+git clone https://github.com/yangbranden/CHIP-8.git
+```
+
+Then download some games (`.ch8` file format) and run using the following syntax:
+
+```
+cargo run -- <path_to_rom>
 ```
 
 ## Games
