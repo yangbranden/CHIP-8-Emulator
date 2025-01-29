@@ -4,7 +4,7 @@ CHIP-8 Emulator made using Rust
 
 used minifb for graphics/user input
 
-## Compilation
+## Installation/Compilation
 
 To try out and compile this emulator, make sure you have cargo installed:
 
