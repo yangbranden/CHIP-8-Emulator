@@ -1,9 +1,13 @@
 use minifb::{Key, Scale, Window, WindowOptions};
+use rodio::{OutputStream, source::{SineWave, Source}};
+use std::time::Duration;
 
 pub struct Interface {
     pub window: Window,
     pub screen: [u32; 64 * 32], // Chip-8 resolution is 64x32
     pub keypad: [bool; 16],
+    sound_stream: Option<(OutputStream, rodio::OutputStreamHandle)>,
+    is_beeping: bool,
 }
 
 impl Interface {
@@ -22,10 +26,15 @@ impl Interface {
             panic!("{}", e);
         });
 
+        // Initialize audio stream
+        let sound_stream = OutputStream::try_default().ok();
+
         Interface {
             window,
             screen: [0; 64 * 32], // Initialize screen with all pixels off (0 = black)
-            keypad: [false; 16],  // Initialize keypad with all keys unpressed
+            keypad: [false; 16],   // Initialize keypad with all keys unpressed
+            sound_stream,
+            is_beeping: false,
         }
     }
 
@@ -95,5 +104,26 @@ impl Interface {
                 _ => (),
             }
         }
+    }
+
+    // Add this new method to control the beep sound
+    pub fn set_beep(&mut self, should_beep: bool) {
+        if should_beep == self.is_beeping {
+            return; // No change needed
+        }
+
+        if let Some((_, stream_handle)) = &self.sound_stream {
+            if should_beep {
+                // Create a sine wave at 440Hz (standard A note)
+                let source = SineWave::new(440.0)
+                    .take_duration(Duration::from_secs(1))
+                    .amplify(0.20); // Reduce volume to 20%
+                
+                // Play the sound
+                let _ = stream_handle.play_raw(source.convert_samples());
+            }
+        }
+
+        self.is_beeping = should_beep;
     }
 }

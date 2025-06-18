@@ -87,9 +87,6 @@ impl Chip8 {
 
         // 3. Update timers
         self.update_timers();
-
-        // 4. Render graphics
-        self.render_screen();
     }
 
     fn fetch_instruction(&mut self) -> u16 {
@@ -284,20 +281,11 @@ impl Chip8 {
         }
 
         if self.sound_timer > 0 {
+            self.interface.set_beep(true);
             self.sound_timer -= 1;
+        } else {
+            self.interface.set_beep(false);
         }
-    }
-
-    fn render_screen(&mut self) {
-        // Example: Set some random pixels to white (0xFFFFFF)
-        // let mut rng = rand::rng();
-        // self.display.set_pixel(rng.random_range(0..64), rng.random_range(0..32), 0xFFFFFF);
-
-        // Render the scaled screen
-        self.interface.render_screen();
-
-        // Poll events (like window closing)
-        self.interface.window.update();
     }
 
     fn cls(&mut self) {
