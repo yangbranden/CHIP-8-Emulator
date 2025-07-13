@@ -1,5 +1,4 @@
 use crate::interface::Interface;
-// use rand::Rng;
 use std::{fs::read, path::Path};
 
 // Memory layout according to https://austinmorlan.com/posts/chip8_emulator/#4k-bytes-of-memory
@@ -421,7 +420,9 @@ impl Chip8 {
     }
 
     fn drw(&mut self, x: usize, y: usize, n: u8) {
-        println!("Drawing {}-byte sprite at ({}, {})", n, self.v[x], self.v[y]);
+        if self.interface.debug_mode {
+            println!("Drawing {}-byte sprite at ({}, {})", n, self.v[x], self.v[y]);
+        }
 
         // Get the starting coordinates from the input registers
         let start_x = self.v[x] as usize;

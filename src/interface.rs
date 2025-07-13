@@ -7,6 +7,7 @@ pub struct Interface {
     pub screen: [u32; 64 * 32], // Chip-8 resolution is 64x32
     pub keypad: [bool; 16],
     pub muted: bool,
+    pub debug_mode: bool, // Debug mode to print additional information
     sound_stream: Option<(OutputStream, rodio::OutputStreamHandle)>,
     is_beeping: bool,
 }
@@ -34,9 +35,10 @@ impl Interface {
             window,
             screen: [0; 64 * 32], // Initialize screen with all pixels off (0 = black)
             keypad: [false; 16],   // Initialize keypad with all keys unpressed
+            muted: false,
+            debug_mode: false,
             sound_stream,
             is_beeping: false,
-            muted: false,
         }
     }
 
