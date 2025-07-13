@@ -38,12 +38,6 @@ impl Interface {
         }
     }
 
-    // Set a pixel on the screen
-    // pub fn set_pixel(&mut self, x: usize, y: usize, color: u32) {
-    //     let index = y * 64 + x;
-    //     self.screen[index] = color;
-    // }
-
     // Render screen by updating the window with the current screen buffer
     pub fn render_screen(&mut self) {
         let width = 64; // Original screen width

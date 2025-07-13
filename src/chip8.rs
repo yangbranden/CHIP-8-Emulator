@@ -421,21 +421,35 @@ impl Chip8 {
     }
 
     fn drw(&mut self, x: usize, y: usize, n: u8) {
-        // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision
-        let x = self.v[x] as usize;
-        let y = self.v[y] as usize;
+        // Get the starting coordinates from the input registers
+        let start_x = self.v[x] as usize;
+        let start_y = self.v[y] as usize;
 
+        // Reset the collision flag (VF)
         self.v[0xF] = 0;
+
+        // Loop over each of the n rows of the sprite (one row per byte)
         for yline in 0..n {
-            let pixel = self.memory[(self.i + yline as u16) as usize];
+            // Get the 8-bit sprite data for the current row from memory
+            let sprite_data = self.memory[(self.i + yline as u16) as usize];
+
+            // Loop over the 8 bits (pixels) of the current sprite row
             for xline in 0..8 {
-                if (pixel & (0x80 >> xline)) != 0 {
-                    let x = (x + xline) % 64;
-                    let y = (y + yline as usize) % 32;
-                    let index = y * 64 + x;
+                // Check if the current bit/pixel is set to 1
+                if (sprite_data & (0x80 >> xline)) != 0 {
+                    // Calculate the final screen coordinates for the pixel, applying wrapping
+                    let final_x = (start_x + xline) % 64;
+                    let final_y = (start_y + yline as usize) % 32;
+
+                    // Convert 2D coordinates to a 1D index for the screen buffer
+                    let index = final_y * 64 + final_x;
+
+                    // Check for collision: if the pixel on screen is already on, set the VF flag
                     if self.interface.screen[index] == 0xFFFFFF {
                         self.v[0xF] = 1;
                     }
+
+                    // XOR the pixel onto the screen buffer
                     self.interface.screen[index] ^= 0xFFFFFF;
                 }
             }
