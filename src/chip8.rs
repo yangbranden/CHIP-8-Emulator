@@ -112,9 +112,9 @@ impl Chip8 {
         // http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#3.1
         match opcode & 0xF000 {
             0x0000 => {
-                match opcode & 0x000F {
-                    0x0000 => self.cls(), // CLS: Clear the display
-                    0x000E => self.ret(), // RET: Return from subroutine
+                match opcode & 0x00FF {
+                    0x00E0 => self.cls(), // CLS: Clear the display
+                    0x00EE => self.ret(), // RET: Return from subroutine
                     _ => println!("Unknown opcode: {:X}", opcode),
                 }
             }
@@ -421,6 +421,8 @@ impl Chip8 {
     }
 
     fn drw(&mut self, x: usize, y: usize, n: u8) {
+        println!("Drawing {}-byte sprite at ({}, {})", n, self.v[x], self.v[y]);
+
         // Get the starting coordinates from the input registers
         let start_x = self.v[x] as usize;
         let start_y = self.v[y] as usize;

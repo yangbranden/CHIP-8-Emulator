@@ -6,6 +6,7 @@ pub struct Interface {
     pub window: Window,
     pub screen: [u32; 64 * 32], // Chip-8 resolution is 64x32
     pub keypad: [bool; 16],
+    pub muted: bool,
     sound_stream: Option<(OutputStream, rodio::OutputStreamHandle)>,
     is_beeping: bool,
 }
@@ -35,6 +36,7 @@ impl Interface {
             keypad: [false; 16],   // Initialize keypad with all keys unpressed
             sound_stream,
             is_beeping: false,
+            muted: false,
         }
     }
 
@@ -43,20 +45,9 @@ impl Interface {
         let width = 64; // Original screen width
         let height = 32; // Original screen height
 
-        // Create a screen buffer with the original resolution
-        let mut screen_buffer: Vec<u32> = vec![0; width * height];
-
-        for y in 0..height {
-            let base_y = y * width; // Pre-calculate y * width to avoid repeated computation
-            for x in 0..width {
-                let color = self.screen[base_y + x]; // Get the original pixel color
-                screen_buffer[base_y + x] = color; // Set the pixel color in the buffer
-            }
-        }
-
         // Update the window with the screen buffer (no scaling)
         self.window
-            .update_with_buffer(&screen_buffer, width, height)
+            .update_with_buffer(&self.screen, width, height)
             .unwrap();
     }
 
@@ -72,9 +63,11 @@ impl Interface {
     // +-+-+-+-+    +-+-+-+-+
     // |A|0|B|F|    |Z|X|C|V|
     // +-+-+-+-+    +-+-+-+-+
-    pub fn process_keys(&mut self, keys: Vec<Key>) {
+    pub fn process_keys(&mut self) {
         // Clear the current state of the keypad
         self.keypad = [false; 16];
+
+        let keys = self.window.get_keys();
 
         // Update the keypad based on the pressed keys
         for key in keys {
@@ -100,8 +93,12 @@ impl Interface {
         }
     }
 
-    // Add this new method to control the beep sound
+
     pub fn set_beep(&mut self, should_beep: bool) {
+        if self.muted {
+            return; // If muted, do not play sound
+        }
+
         if should_beep == self.is_beeping {
             return; // No change needed
         }
@@ -111,7 +108,7 @@ impl Interface {
                 // Create a sine wave at 440Hz (standard A note)
                 let source = SineWave::new(440.0)
                     .take_duration(Duration::from_secs(1))
-                    .amplify(0.20); // Reduce volume to 20%
+                    .amplify(0.10); // Reduce volume to 10%
                 
                 // Play the sound
                 let _ = stream_handle.play_raw(source.convert_samples());

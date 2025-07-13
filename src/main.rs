@@ -6,7 +6,6 @@ mod chip8;
 use chip8::Chip8;
 use minifb::{Key, Scale};
 use std::path::Path;
-use std::time::{Duration, Instant};
 
 fn main() {
     // Get rom_filepath from command-line arguments
@@ -36,34 +35,25 @@ fn main() {
     chip8.load_program(rom_path);
 
     // Define clock speeds
-    let cpu_hz = 500.0; // Instructions per second
+    let cpu_hz = 200.0; // Instructions per second
     let display_hz = 60.0; // Frames per second
 
-    let cpu_interval = Duration::from_secs_f64(1.0 / cpu_hz);
-    let display_interval = Duration::from_secs_f64(1.0 / display_hz);
+    let cycles_per_frame = (cpu_hz / display_hz) as usize;
 
-    let mut last_cpu_tick = Instant::now();
-    let mut last_display_tick = Instant::now();
+    // Whether or not to mute the sound
+    chip8.interface.muted = true;
 
     // Main loop; exit if window is closed or Escape is pressed
     while chip8.interface.window.is_open() && !chip8.interface.window.is_key_down(Key::Escape) {
-        let current_time = Instant::now();
+        // Process user input
+        chip8.interface.process_keys();
 
         // Process CPU cycles
-        if current_time - last_cpu_tick >= cpu_interval {
-            let keys = chip8.interface.window.get_keys();
-            chip8.interface.process_keys(keys);
-
-            // Update timers and execute instruction
+        for _ in 0..cycles_per_frame {
             chip8.emulate_cycle();
-
-            last_cpu_tick = current_time;
         }
 
-        // Update display
-        if current_time - last_display_tick >= display_interval {
-            chip8.interface.render_screen();
-            last_display_tick = current_time;
-        }
+        // Render the display
+        chip8.interface.render_screen();
     }
 }
