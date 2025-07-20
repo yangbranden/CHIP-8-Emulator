@@ -4,7 +4,7 @@ use std::time::Duration;
 
 pub struct Interface {
     pub window: Window,
-    pub screen: [u32; 64 * 32], // Chip-8 resolution is 64x32
+    pub framebuffer: [u32; 64 * 32], // Chip-8 resolution is 64x32
     pub keypad: [bool; 16],
     pub muted: bool,
     pub debug_mode: bool, // Debug mode to print additional information
@@ -33,7 +33,7 @@ impl Interface {
 
         Interface {
             window,
-            screen: [0; 64 * 32], // Initialize screen with all pixels off (0 = black)
+            framebuffer: [0; 64 * 32], // Initialize screen with all pixels off (0 = black)
             keypad: [false; 16],   // Initialize keypad with all keys unpressed
             muted: false,
             debug_mode: false,
@@ -42,14 +42,14 @@ impl Interface {
         }
     }
 
-    // Render screen by updating the window with the current screen buffer
+    // Render screen by updating the window with the current framebuffer
     pub fn render_screen(&mut self) {
         let width = 64; // Original screen width
         let height = 32; // Original screen height
 
         // Update the window with the screen buffer (no scaling)
         self.window
-            .update_with_buffer(&self.screen, width, height)
+            .update_with_buffer(&self.framebuffer, width, height)
             .unwrap();
     }
 

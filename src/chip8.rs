@@ -289,7 +289,7 @@ impl Chip8 {
 
     fn cls(&mut self) {
         // Clear the screen buffer
-        self.interface.screen.fill(0);
+        self.interface.framebuffer.fill(0);
     }
 
     fn ret(&mut self) {
@@ -448,12 +448,12 @@ impl Chip8 {
                     let index = final_y * 64 + final_x;
 
                     // Check for collision: if the pixel on screen is already on, set the VF flag
-                    if self.interface.screen[index] == 0xFFFFFF {
+                    if self.interface.framebuffer[index] == 0xFFFFFF {
                         self.v[0xF] = 1;
                     }
 
                     // XOR the pixel onto the screen buffer
-                    self.interface.screen[index] ^= 0xFFFFFF;
+                    self.interface.framebuffer[index] ^= 0xFFFFFF;
                 }
             }
         }
