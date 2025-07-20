@@ -9,7 +9,7 @@ use std::path::Path;
 
 // ======================= USER SETTINGS =======================
 const SCALE_FACTOR: Scale = Scale::X16; // Scaling size for screen (original is 64x32; factor of 16 will make it 1024x512)
-const CPU_HZ: f32 = 200.0; // Instructions per second
+const CPU_HZ: f32 = 500.0; // Instructions per second
 const DISPLAY_HZ: f32 = 60.0; // Frames per second
 const MUTED: bool = false; // Whether or not to mute sound
 const DEBUG_MODE: bool = true; // Enable debug mode to print additional information
@@ -35,6 +35,9 @@ fn main() {
     // Create a Chip8 instance with our Interface instance
     let mut chip8 = Chip8::new(interface);
     
+    // Set the window to update at our desired DISPLAY_HZ
+    chip8.interface.window.set_target_fps(DISPLAY_HZ as usize);
+
     // Define the path to the ROM file and load it into memory
     let rom_path = Path::new(&rom_filepath);
     chip8.load_program(rom_path);
