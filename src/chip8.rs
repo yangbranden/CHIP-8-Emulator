@@ -1,13 +1,13 @@
 use crate::interface::Interface;
 use std::{fs::read, path::Path};
 
-// Memory layout according to https://austinmorlan.com/posts/chip8_emulator/#4k-bytes-of-memory
-// 0x000-0x1FF: CHIP-8 interpreter
-//              (in our modern emulator we will just never write to or read to this area)
-// 0x050-0x0A0: Storage space for the 16 built-in characters (0 through F),
-//              which we will need to manually put into our memory because ROMs will be looking for those characters.
+// Memory layout according to http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+// 0x000-0x1FF: CHIP-8 interpreter memory
+//              (in our software emulator we will just never read/write to this area)
+// 0x000-0x080: Location for the 16 font set characters (0 through F),
+//              which we need to manually put into memory because ROMs will reference them
 // 0x200-0xFFF: Instructions from the ROM will be stored starting at 0x200,
-//              and anything left after the ROM’s space is free to use.
+//              and anything left after the ROM’s space is free to use
 pub struct Chip8 {
     memory: [u8; 4096],       // 4KB memory
     v: [u8; 16],              // 16 general-purpose 8-bit registers (V0 through VF)
