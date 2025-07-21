@@ -448,12 +448,12 @@ impl Chip8 {
                     let index = final_y * 64 + final_x;
 
                     // Check for collision: if the pixel on screen is already on, set the VF flag
-                    if self.interface.framebuffer[index] == 0xFFFFFF {
+                    if self.interface.framebuffer[index] == 0xFFFFFFFF {
                         self.v[0xF] = 1;
                     }
 
                     // XOR the pixel onto the screen buffer
-                    self.interface.framebuffer[index] ^= 0xFFFFFF;
+                    self.interface.framebuffer[index] ^= 0xFFFFFFFF;
                 }
             }
         }
